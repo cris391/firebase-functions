@@ -1,31 +1,35 @@
 import * as functions from 'firebase-functions';
 import { Transaction } from './Models/Transaction';
 import { TransactionStatus } from './Enums/TransactionStatus';
-
-
+import { TransactionRequest } from './Models/TransactionRequest';
 
 export const getTransactions = functions.https.onRequest((request, response) => {
   if (request.method != 'POST') {
-    response.status(400).send('I am not happy');
+    response.status(400).send('Method has to be POST');
     return;
   }
   const body = request.body;
   if (!body.hasOwnProperty('userId') || !body.hasOwnProperty('fromDate') || !body.hasOwnProperty('toDate')) {
-    response.send('false');
+    response.status(400).send('Body missing property');
   }
-  const transactionsFound = filterItems(transactions, {
-    userId: body.userId,
-    fromDate: body.fromDate,
-    toDate: body.toDate,
-  });
-
+  let transactionRequest: TransactionRequest;
+  try {
+    transactionRequest = new TransactionRequest(body.userId, body.fromDate, body.toDate);
+    console.log(transactionRequest);
+  } catch (e) {
+    response.send(e);
+    return;
+  }
+  let transactionsFound;
+  transactionsFound = filterItems(transactions, transactionRequest);
   response.send(transactionsFound);
+  return;
 });
 
 /////////
 // Helpers
 /////////
-function filterItems(arr: any, query: any) {
+function filterItems(arr: any, query: TransactionRequest) {
   return arr.filter(function (el: any) {
     return el.userId === query.userId && el.createdDate >= query.fromDate && el.createdDate <= query.toDate;
   });

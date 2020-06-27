@@ -1,6 +1,8 @@
+import { TransactionStatus } from "../Enums/TransactionStatus";
+
 export class Transaction {
 
-  constructor(userId: string, name: string, description: string, status: string,createdDate: number){
+  constructor(userId: string, name: string, description: string, status: TransactionStatus, createdDate: number){
     this.userId = userId;
     this.name = name;
     this.description = description;
@@ -10,6 +12,6 @@ export class Transaction {
   userId: string = '';
   name: string = '';
   description: string = ''
-  status: string = '';
+  status: TransactionStatus;
   createdDate: number = 0;
 }
